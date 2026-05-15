@@ -72,6 +72,15 @@
     { "name": "Dan Shipper", "handle": "danshipper" },
     { "name": "Aditya Agarwal", "handle": "adityaag" },
     { "name": "Sam Altman", "handle": "sama" },
-    { "name": "Claude", "handle": "claudeai" }
+    { "name": "Claude", "handle": "claudeai" },
+    { "name": "Ethan Mollick", "handle": "emollick" },
+    { "name": "Simon Willison", "handle": "simonw" },
+    { "name": "Yann LeCun", "handle": "ylecun" },
+    { "name": "Greg Brockman", "handle": "gdb" }
+  ],
+  "youtube_channels": [
+    { "name": "Andrej Karpathy", "handle": "AndrejKarpathy" },
+    { "name": "Lex Fridman", "handle": "lexfridman" },
+    { "name": "Y Combinator", "handle": "ycombinator" }
   ]
 }

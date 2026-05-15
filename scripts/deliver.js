@@ -58,6 +58,26 @@ async function getDigestText() {
   return Buffer.concat(chunks).toString('utf-8');
 }
 
+// -- Retry helper ------------------------------------------------------------
+
+// Retries a fetch on network-level failures (e.g. "fetch failed", ECONNRESET).
+// HTTP errors (4xx/5xx) are NOT retried — only thrown exceptions.
+async function fetchWithRetry(url, options, maxAttempts = 3) {
+  let lastError;
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    try {
+      return await fetch(url, options);
+    } catch (err) {
+      lastError = err;
+      if (attempt < maxAttempts) {
+        const delay = Math.pow(2, attempt) * 1000; // 2s, 4s, 8s
+        await new Promise(r => setTimeout(r, delay));
+      }
+    }
+  }
+  throw lastError;
+}
+
 // -- Telegram Delivery -------------------------------------------------------
 
 // Sends the digest via Telegram Bot API.
@@ -82,7 +102,7 @@ async function sendTelegram(text, botToken, chatId) {
   }
 
   for (const chunk of chunks) {
-    const res = await fetch(
+    const res = await fetchWithRetry(
       `https://api.telegram.org/bot${botToken}/sendMessage`,
       {
         method: 'POST',
@@ -100,7 +120,7 @@ async function sendTelegram(text, botToken, chatId) {
       const err = await res.json();
       // If Markdown parsing fails, retry without parse_mode
       if (err.description && err.description.includes("can't parse")) {
-        await fetch(
+        await fetchWithRetry(
           `https://api.telegram.org/bot${botToken}/sendMessage`,
           {
             method: 'POST',
@@ -127,7 +147,7 @@ async function sendTelegram(text, botToken, chatId) {
 // Sends the digest via Resend's email API.
 // The user provides their own Resend API key and email address.
 async function sendEmail(text, apiKey, toEmail) {
-  const res = await fetch('https://api.resend.com/emails', {
+  const res = await fetchWithRetry('https://api.resend.com/emails', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

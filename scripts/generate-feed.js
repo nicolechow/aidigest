@@ -27,8 +27,10 @@ const RSS_USER_AGENT = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWeb
 const TWEET_LOOKBACK_HOURS = 24;
 const PODCAST_LOOKBACK_HOURS = 336; // 14 days — podcasts publish weekly/biweekly, not daily
 const BLOG_LOOKBACK_HOURS = 72;
+const YOUTUBE_LOOKBACK_HOURS = 168; // 7 days — YouTube channels post infrequently
 const MAX_TWEETS_PER_USER = 3;
 const MAX_ARTICLES_PER_BLOG = 3;
+const MAX_VIDEOS_PER_CHANNEL = 1;
 
 // State file lives in the repo root so it gets committed by GitHub Actions
 const SCRIPT_DIR = decodeURIComponent(new URL('.', import.meta.url).pathname);
@@ -682,6 +684,167 @@ async function fetchBlogContent(blogs, state, errors) {
   return results;
 }
 
+// -- YouTube Fetching (channel RSS + native captions) ------------------------
+
+// Parses a YouTube Atom feed (videos.xml) and returns video metadata.
+function parseYouTubeRss(xml) {
+  const videos = [];
+  const entryRegex = /<entry>([\s\S]*?)<\/entry>/gi;
+  let entryMatch;
+  while ((entryMatch = entryRegex.exec(xml)) !== null) {
+    const block = entryMatch[1];
+    const videoIdMatch = block.match(/<yt:videoId>([\s\S]*?)<\/yt:videoId>/);
+    const titleMatch = block.match(/<title>([\s\S]*?)<\/title>/);
+    const publishedMatch = block.match(/<published>([\s\S]*?)<\/published>/);
+    const videoId = videoIdMatch ? videoIdMatch[1].trim() : null;
+    const title = titleMatch
+      ? titleMatch[1].replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').trim()
+      : 'Untitled';
+    const publishedAt = publishedMatch ? new Date(publishedMatch[1].trim()).toISOString() : null;
+    if (videoId) videos.push({ videoId, title, publishedAt });
+  }
+  return videos;
+}
+
+// Resolves a YouTube channel ID from a @handle by fetching the channel page.
+async function resolveYouTubeChannelId(handle) {
+  try {
+    const res = await fetch(`https://www.youtube.com/@${handle}`, {
+      headers: { 'User-Agent': RSS_USER_AGENT, 'Accept-Language': 'en-US,en;q=0.9' },
+      signal: AbortSignal.timeout(15000)
+    });
+    if (!res.ok) return null;
+    const html = await res.text();
+    const match = html.match(/"channelId":"(UC[a-zA-Z0-9_-]{22})"/)
+      || html.match(/\/channel\/(UC[a-zA-Z0-9_-]{22})"/);
+    return match ? match[1] : null;
+  } catch {
+    return null;
+  }
+}
+
+// Fetches a YouTube video's auto-generated captions without any API key.
+// Parses the native caption track from the video page's embedded JSON.
+async function fetchYouTubeTranscript(videoId) {
+  try {
+    const res = await fetch(`https://www.youtube.com/watch?v=${videoId}`, {
+      headers: { 'User-Agent': RSS_USER_AGENT, 'Accept-Language': 'en-US,en;q=0.9' },
+      signal: AbortSignal.timeout(20000)
+    });
+    if (!res.ok) return null;
+    const html = await res.text();
+
+    // Extract caption track list from the embedded player response
+    const playerMatch = html.match(/ytInitialPlayerResponse\s*=\s*(\{.+?\})\s*(?:;|<\/script>)/);
+    if (!playerMatch) return null;
+
+    const data = JSON.parse(playerMatch[1]);
+    const tracks = data?.captions?.playerCaptionsTracklistRenderer?.captionTracks;
+    if (!tracks || tracks.length === 0) return null;
+
+    // Prefer English; fall back to first available track
+    const track = tracks.find(t => t.languageCode === 'en')
+      || tracks.find(t => t.languageCode?.startsWith('en'))
+      || tracks[0];
+
+    // Fetch the caption XML and join segments into plain text
+    const captionRes = await fetch(track.baseUrl, { signal: AbortSignal.timeout(15000) });
+    if (!captionRes.ok) return null;
+    const captionXml = await captionRes.text();
+
+    const segments = [];
+    const textRegex = /<text[^>]*>([\s\S]*?)<\/text>/g;
+    let m;
+    while ((m = textRegex.exec(captionXml)) !== null) {
+      const text = m[1]
+        .replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>')
+        .replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&nbsp;/g, ' ')
+        .replace(/\n/g, ' ').trim();
+      if (text) segments.push(text);
+    }
+    return segments.length > 0 ? segments.join(' ') : null;
+  } catch {
+    return null;
+  }
+}
+
+// Main YouTube fetching function. For each channel:
+// 1. Resolves the channel ID from the @handle
+// 2. Fetches the YouTube RSS feed to discover recent videos
+// 3. Filters by lookback window and dedup
+// 4. Fetches auto-generated captions for new videos
+async function fetchYouTubeContent(youtubeChannels, state, errors) {
+  const results = [];
+  const cutoff = new Date(Date.now() - YOUTUBE_LOOKBACK_HOURS * 60 * 60 * 1000);
+
+  for (const channel of youtubeChannels) {
+    try {
+      console.error(`  Processing YouTube channel: ${channel.name}...`);
+
+      // Resolve channel ID (cached in config as channelId, or derive from handle)
+      let channelId = channel.channelId;
+      if (!channelId) {
+        channelId = await resolveYouTubeChannelId(channel.handle);
+        if (!channelId) {
+          errors.push(`YouTube: Could not resolve channel ID for ${channel.name} (@${channel.handle})`);
+          continue;
+        }
+        console.error(`    Resolved channel ID: ${channelId}`);
+      }
+
+      // Fetch YouTube's Atom RSS feed for the channel
+      const rssUrl = `https://www.youtube.com/feeds/videos.xml?channel_id=${channelId}`;
+      const rssRes = await fetch(rssUrl, {
+        headers: { 'User-Agent': RSS_USER_AGENT },
+        signal: AbortSignal.timeout(15000)
+      });
+      if (!rssRes.ok) {
+        errors.push(`YouTube: RSS fetch failed for ${channel.name}: HTTP ${rssRes.status}`);
+        continue;
+      }
+
+      const videos = parseYouTubeRss(await rssRes.text());
+      console.error(`    Found ${videos.length} videos in RSS feed`);
+
+      // Filter: within lookback window, not already seen
+      const newVideos = videos
+        .filter(v => !state.seenVideos[v.videoId])
+        .filter(v => !v.publishedAt || new Date(v.publishedAt) >= cutoff)
+        .slice(0, MAX_VIDEOS_PER_CHANNEL);
+
+      for (const video of newVideos) {
+        console.error(`    Fetching transcript for "${video.title}"...`);
+        const transcript = await fetchYouTubeTranscript(video.videoId);
+
+        // Mark as seen so we don't retry videos that had no captions
+        state.seenVideos[video.videoId] = Date.now();
+
+        if (!transcript) {
+          console.error(`    No captions available — skipping`);
+          errors.push(`YouTube: No captions for "${video.title}" (${video.videoId})`);
+          continue;
+        }
+
+        console.error(`    Got transcript (${transcript.length} chars)`);
+        results.push({
+          source: 'youtube',
+          name: channel.name,
+          handle: channel.handle,
+          title: video.title,
+          videoId: video.videoId,
+          url: `https://www.youtube.com/watch?v=${video.videoId}`,
+          publishedAt: video.publishedAt,
+          transcript
+        });
+      }
+    } catch (err) {
+      errors.push(`YouTube: Error processing ${channel.name}: ${err.message}`);
+    }
+  }
+
+  return results;
+}
+
 // -- Main --------------------------------------------------------------------
 
 async function main() {
@@ -689,12 +852,13 @@ async function main() {
   const tweetsOnly = args.includes('--tweets-only');
   const podcastsOnly = args.includes('--podcasts-only');
   const blogsOnly = args.includes('--blogs-only');
+  const youtubeOnly = args.includes('--youtube-only');
 
-  // If a specific --*-only flag is set, only that feed type runs.
-  // If no flag is set, all three run.
-  const runTweets = tweetsOnly || (!podcastsOnly && !blogsOnly);
-  const runPodcasts = podcastsOnly || (!tweetsOnly && !blogsOnly);
-  const runBlogs = blogsOnly || (!tweetsOnly && !podcastsOnly);
+  const anyOnly = tweetsOnly || podcastsOnly || blogsOnly || youtubeOnly;
+  const runTweets = tweetsOnly || !anyOnly;
+  const runPodcasts = podcastsOnly || !anyOnly;
+  const runBlogs = blogsOnly || !anyOnly;
+  const runYouTube = youtubeOnly || !anyOnly;
 
   const xBearerToken = process.env.X_BEARER_TOKEN;
   const pod2txtKey = process.env.POD2TXT_API_KEY;
@@ -707,6 +871,7 @@ async function main() {
     console.error('X_BEARER_TOKEN not set');
     process.exit(1);
   }
+  // YouTube requires no API key — captions are fetched from the public video page
 
   const sources = await loadSources();
   const state = await loadState();
@@ -765,6 +930,24 @@ async function main() {
     };
     await writeFile(join(SCRIPT_DIR, '..', 'feed-blogs.json'), JSON.stringify(blogFeed, null, 2));
     console.error(`  feed-blogs.json: ${blogContent.length} posts`);
+  }
+
+  // Fetch YouTube videos
+  if (runYouTube && sources.youtube_channels && sources.youtube_channels.length > 0) {
+    console.error('Fetching YouTube content...');
+    const youtubeContent = await fetchYouTubeContent(sources.youtube_channels, state, errors);
+    console.error(`  Found ${youtubeContent.length} new video(s)`);
+
+    const youtubeFeed = {
+      generatedAt: new Date().toISOString(),
+      lookbackHours: YOUTUBE_LOOKBACK_HOURS,
+      youtube: youtubeContent,
+      stats: { youtubeVideos: youtubeContent.length },
+      errors: errors.filter(e => e.startsWith('YouTube')).length > 0
+        ? errors.filter(e => e.startsWith('YouTube')) : undefined
+    };
+    await writeFile(join(SCRIPT_DIR, '..', 'feed-youtube.json'), JSON.stringify(youtubeFeed, null, 2));
+    console.error(`  feed-youtube.json: ${youtubeContent.length} videos`);
   }
 
   // Save dedup state
