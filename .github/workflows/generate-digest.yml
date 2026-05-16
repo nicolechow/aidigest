@@ -1,0 +1,42 @@
+name: Generate and Deliver Digest
+
+on:
+  # Run right after feeds are successfully updated
+  workflow_run:
+    workflows: ["Generate Feeds"]
+    types: [completed]
+  # Fallback daily schedule: 8am UTC = 4pm SGT
+  schedule:
+    - cron: '0 8 * * *'
+  # Manual trigger for testing
+  workflow_dispatch:
+
+jobs:
+  digest:
+    runs-on: ubuntu-latest
+    # For workflow_run, only proceed if feeds generated successfully
+    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: cd scripts && npm install
+
+      - name: Set up delivery config
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          mkdir -p ~/.follow-builders
+          echo "TELEGRAM_BOT_TOKEN=$TELEGRAM_BOT_TOKEN" > ~/.follow-builders/.env
+          echo '{"language":"en","delivery":{"method":"telegram","chatId":"'"$TELEGRAM_CHAT_ID"'"}}' > ~/.follow-builders/config.json
+
+      - name: Generate and deliver digest
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: cd scripts && node generate-digest.js | node deliver.js
