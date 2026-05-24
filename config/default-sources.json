@@ -29,6 +29,16 @@
       "name": "AI & I by Every",
       "rssUrl": "https://anchor.fm/s/ed1f5584/podcast/rss",
       "url": "https://www.youtube.com/playlist?list=PLuMcoKK9mKgHtW_o9h5sGO2vXrffKHwJL"
+    },
+    {
+      "name": "Lenny's Podcast",
+      "rssUrl": "https://api.substack.com/feed/podcast/10845.rss",
+      "url": "https://www.youtube.com/@LennysPodcast"
+    },
+    {
+      "name": "自习室 STUDY ROOM",
+      "rssUrl": "https://www.ximalaya.com/album/80074602.xml",
+      "url": "https://www.xiaoyuzhoufm.com/podcast/自习室"
     }
   ],
   "blogs": [
