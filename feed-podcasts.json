@@ -1,17 +1,11 @@
 {
-  "generatedAt": "2026-05-27T02:03:56.179Z",
+  "generatedAt": "2026-05-27T14:24:05.917Z",
   "lookbackHours": 336,
   "podcasts": [],
   "stats": {
     "podcastEpisodes": 0
   },
   "errors": [
-    "Podcast: YouTube RSS fetch failed for Latent Space: HTTP 404",
-    "Podcast: YouTube RSS fetch failed for Training Data: HTTP 404",
-    "Podcast: YouTube RSS fetch failed for No Priors: HTTP 404",
-    "Podcast: YouTube RSS fetch failed for Unsupervised Learning: HTTP 404",
-    "Podcast: YouTube RSS fetch failed for The MAD Podcast with Matt Turck: HTTP 404",
-    "Podcast: YouTube RSS fetch failed for AI & I by Every: HTTP 404",
-    "Podcast: YouTube RSS fetch failed for Lenny's Podcast: HTTP 404"
+    "Podcast: POD2TXT_API_KEY not set"
   ]
 }

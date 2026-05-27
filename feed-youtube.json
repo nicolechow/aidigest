@@ -1,13 +1,8 @@
 {
-  "generatedAt": "2026-05-27T02:04:10.351Z",
+  "generatedAt": "2026-05-27T14:24:16.603Z",
   "lookbackHours": 168,
   "youtube": [],
   "stats": {
     "youtubeVideos": 0
-  },
-  "errors": [
-    "YouTube: RSS fetch failed for Andrej Karpathy: HTTP 404",
-    "YouTube: RSS fetch failed for Lex Fridman: HTTP 404",
-    "YouTube: RSS fetch failed for Y Combinator: HTTP 404"
-  ]
+  }
 }
