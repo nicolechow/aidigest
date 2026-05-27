@@ -10,7 +10,7 @@
 // URLs in state-feed.json so content is never repeated across runs.
 //
 // Usage: node generate-feed.js [--tweets-only | --podcasts-only | --blogs-only]
-// Env vars needed: TWITTER_USERNAME, TWITTER_PASSWORD, TWITTER_EMAIL, POD2TXT_API_KEY
+// Env vars needed: X_BEARER_TOKEN (preferred) or TWITTER_USERNAME/PASSWORD/EMAIL, POD2TXT_API_KEY
 // ============================================================================
 
 import { readFile, writeFile } from 'fs/promises';
@@ -232,9 +232,101 @@ async function fetchPodcastContent(podcasts, apiKey, state, errors) {
   return [];
 }
 
-// -- X/Twitter Fetching (agent-twitter-client, no API key required) ----------
+// -- X/Twitter Fetching ------------------------------------------------------
 
-async function fetchXContent(xAccounts, credentials, state, errors) {
+async function xApiRequest(path, bearerToken, params = {}) {
+  const url = new URL(`${X_API_BASE}${path}`);
+  for (const [key, value] of Object.entries(params)) {
+    if (value !== undefined && value !== null) url.searchParams.set(key, value);
+  }
+
+  const res = await fetch(url, {
+    headers: {
+      Authorization: `Bearer ${bearerToken}`,
+      'User-Agent': 'aidigest/1.0'
+    },
+    signal: AbortSignal.timeout(30000)
+  });
+
+  const text = await res.text();
+  const data = text ? JSON.parse(text) : {};
+  if (!res.ok) {
+    const message = data?.errors?.map(e => e.detail || e.message).join('; ')
+      || data?.detail
+      || data?.title
+      || text
+      || `HTTP ${res.status}`;
+    throw new Error(message);
+  }
+  return data;
+}
+
+async function fetchXContentWithBearer(xAccounts, bearerToken, state, errors) {
+  const results = [];
+  const cutoff = new Date(Date.now() - TWEET_LOOKBACK_HOURS * 60 * 60 * 1000);
+
+  console.error('  X: using bearer token API');
+  for (const account of xAccounts) {
+    try {
+      const user = await xApiRequest(`/users/by/username/${account.handle}`, bearerToken, {
+        'user.fields': 'description'
+      });
+      const userId = user?.data?.id;
+      if (!userId) {
+        errors.push(`X: User not found @${account.handle}`);
+        continue;
+      }
+
+      const timeline = await xApiRequest(`/users/${userId}/tweets`, bearerToken, {
+        max_results: '10',
+        exclude: 'retweets,replies',
+        'tweet.fields': 'created_at,public_metrics,referenced_tweets'
+      });
+
+      const tweets = [];
+      for (const tweet of timeline.data || []) {
+        if (!tweet.id) continue;
+        if (state.seenTweets[tweet.id]) continue;
+
+        const createdAt = tweet.created_at || null;
+        if (createdAt && new Date(createdAt) < cutoff) continue;
+
+        const metrics = tweet.public_metrics || {};
+        tweets.push({
+          id: tweet.id,
+          text: tweet.text || '',
+          createdAt,
+          url: `https://x.com/${account.handle}/status/${tweet.id}`,
+          likes: metrics.like_count || 0,
+          retweets: metrics.retweet_count || 0,
+          replies: metrics.reply_count || 0,
+          isQuote: (tweet.referenced_tweets || []).some(ref => ref.type === 'quoted'),
+        });
+
+        state.seenTweets[tweet.id] = Date.now();
+        if (tweets.length >= MAX_TWEETS_PER_USER) break;
+      }
+
+      if (tweets.length > 0) {
+        results.push({
+          source: 'x',
+          name: account.name,
+          handle: account.handle,
+          bio: user.data?.description || '',
+          tweets
+        });
+      }
+
+      await new Promise(r => setTimeout(r, 250));
+    } catch (err) {
+      errors.push(`X: Error fetching @${account.handle}: ${err.message}`);
+    }
+  }
+
+  return results;
+}
+
+async function fetchXContentWithScraper(xAccounts, credentials, state, errors) {
   const results = [];
   const cutoff = new Date(Date.now() - TWEET_LOOKBACK_HOURS * 60 * 60 * 1000);
 
@@ -299,6 +391,13 @@ async function fetchXContent(xAccounts, credentials, state, errors) {
   }
 
   return results;
+}
+
+async function fetchXContent(xAccounts, credentials, bearerToken, state, errors) {
+  if (bearerToken) {
+    return fetchXContentWithBearer(xAccounts, bearerToken, state, errors);
+  }
+  return fetchXContentWithScraper(xAccounts, credentials, state, errors);
 }
 
 // -- Blog Fetching (HTML scraping) -------------------------------------------
@@ -790,10 +889,11 @@ async function main() {
     password: process.env.TWITTER_PASSWORD,
     email: process.env.TWITTER_EMAIL,
   };
+  const xBearerToken = process.env.X_BEARER_TOKEN;
   const pod2txtKey = process.env.POD2TXT_API_KEY;
 
-  if (runTweets && (!twitterCreds.username || !twitterCreds.password || !twitterCreds.email)) {
-    console.error('TWITTER_USERNAME, TWITTER_PASSWORD, and TWITTER_EMAIL must all be set');
+  if (runTweets && !xBearerToken && (!twitterCreds.username || !twitterCreds.password || !twitterCreds.email)) {
+    console.error('X_BEARER_TOKEN or TWITTER_USERNAME/PASSWORD/EMAIL must be set');
     process.exit(1);
   }
   const sources = await loadSources();
@@ -803,7 +903,7 @@ async function main() {
   // Fetch tweets
   if (runTweets) {
     console.error('Fetching X/Twitter content...');
-    const xContent = await fetchXContent(sources.x_accounts, twitterCreds, state, errors);
+    const xContent = await fetchXContent(sources.x_accounts, twitterCreds, xBearerToken, state, errors);
     console.error(`  Found ${xContent.length} builders with new tweets`);
 
     const totalTweets = xContent.reduce((sum, a) => sum + a.tweets.length, 0);
