@@ -5,6 +5,10 @@
 ### Changed
 - **X/Twitter**: 从官方 API（需要 $100/月）换成 `agent-twitter-client`，用 Twitter 账号登录抓取，不再需要 `X_BEARER_TOKEN`
   - 新增 Secrets：`TWITTER_USERNAME`、`TWITTER_PASSWORD`、`TWITTER_EMAIL`
+- **播客转录**：恢复 RSS + `pod2txt` 路径，不再通过失效的 YouTube RSS 发现 podcast episode
+  - 需要 Secret：`POD2TXT_API_KEY`
+  - 转录失败的 episode 不再提前标记为已读，后续运行可重试
+  - podcast 去重状态保留 21 天，覆盖 14 天回看窗口
 
 ## 2026-05-24
 

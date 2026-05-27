@@ -22,7 +22,7 @@ jobs:
           node-version: '20'
 
       - name: Install dependencies
-        run: cd scripts && npm install
+        run: cd scripts && npm ci
 
       - name: Set up delivery config
         env:

@@ -3,14 +3,14 @@
 // ============================================================================
 // Follow Builders — Central Feed Generator
 // ============================================================================
-// Runs on GitHub Actions (daily at 6am UTC) to fetch content and publish
+// Runs on GitHub Actions (daily at 11am UTC / 7pm SGT) to fetch content and publish
 // feed-x.json, feed-podcasts.json, and feed-blogs.json.
 //
 // Deduplication: tracks previously seen tweet IDs, episode GUIDs, and article
 // URLs in state-feed.json so content is never repeated across runs.
 //
 // Usage: node generate-feed.js [--tweets-only | --podcasts-only | --blogs-only]
-// Env vars needed: TWITTER_USERNAME, TWITTER_PASSWORD, TWITTER_EMAIL, DEEPGRAM_API_KEY
+// Env vars needed: TWITTER_USERNAME, TWITTER_PASSWORD, TWITTER_EMAIL, POD2TXT_API_KEY
 // ============================================================================
 
 import { readFile, writeFile } from 'fs/promises';
@@ -20,6 +20,7 @@ import { Scraper } from 'agent-twitter-client';
 
 // -- Constants ---------------------------------------------------------------
 
+const POD2TXT_BASE = 'https://pod2txt.vercel.app/api';
 const X_API_BASE = 'https://api.x.com/2';
 // Some RSS hosts (notably Substack) block non-browser user agents from cloud IPs.
 // Using a real Chrome UA avoids 403 errors in GitHub Actions.
@@ -56,13 +57,14 @@ async function loadState() {
 }
 
 async function saveState(state) {
-  // Prune entries older than 7 days to prevent the file from growing forever
+  // Keep podcast/video dedupe state beyond the 14-day podcast lookback.
   const cutoff = Date.now() - 7 * 24 * 60 * 60 * 1000;
+  const videoCutoff = Date.now() - 21 * 24 * 60 * 60 * 1000;
   for (const [id, ts] of Object.entries(state.seenTweets)) {
     if (ts < cutoff) delete state.seenTweets[id];
   }
   for (const [id, ts] of Object.entries(state.seenVideos)) {
-    if (ts < cutoff) delete state.seenVideos[id];
+    if (ts < videoCutoff) delete state.seenVideos[id];
   }
   for (const [id, ts] of Object.entries(state.seenArticles || {})) {
     if (ts < cutoff) delete state.seenArticles[id];
@@ -77,10 +79,10 @@ async function loadSources() {
   return JSON.parse(await readFile(sourcesPath, 'utf-8'));
 }
 
-// -- Podcast Fetching (RSS + YouTube captions / Deepgram) --------------------
+// -- Podcast Fetching (RSS + pod2txt) ----------------------------------------
 
 // Parses an RSS feed XML string and returns episode objects with
-// title, publishedAt, guid, link, and enclosureUrl. RSS feeds list newest first.
+// title, publishedAt, guid, and link. RSS feeds list newest first.
 function parseRssFeed(xml) {
   const episodes = [];
   const itemRegex = /<item>([\s\S]*?)<\/item>/gi;
@@ -102,182 +104,132 @@ function parseRssFeed(xml) {
     const linkMatch = block.match(/<link>([\s\S]*?)<\/link>/);
     const link = linkMatch ? linkMatch[1].trim() : null;
 
-    // Audio file URL from <enclosure> tag — used for Deepgram transcription
-    const enclosureMatch = block.match(/<enclosure[^>]*url="([^"]+)"[^>]*/i);
-    const enclosureUrl = enclosureMatch ? enclosureMatch[1] : null;
-
     if (guid) {
-      episodes.push({ title, guid, publishedAt, link, enclosureUrl });
+      episodes.push({ title, guid, publishedAt, link });
     }
   }
   return episodes;
 }
 
-// Transcribes audio from a URL using Deepgram's pre-recorded API.
-// Used for non-YouTube podcasts (e.g. 小宇宙) where we can't get captions.
-async function fetchDeepgramTranscript(audioUrl, apiKey) {
-  const res = await fetch(
-    'https://api.deepgram.com/v1/listen?model=nova-2&smart_format=true&detect_language=true',
-    {
-      method: 'POST',
-      headers: {
-        'Authorization': `Token ${apiKey}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ url: audioUrl }),
-      signal: AbortSignal.timeout(300000) // 5 min — podcast episodes can be long
-    }
-  );
+// pod2txt begins transcription asynchronously; poll until its result is ready.
+async function fetchPod2txtTranscript(rssUrl, guid, apiKey) {
+  const maxAttempts = 5;
+  const pollInterval = 30000;
 
-  if (!res.ok) {
-    const text = await res.text().catch(() => '');
-    return { error: `Deepgram HTTP ${res.status}: ${text}` };
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    const res = await fetch(`${POD2TXT_BASE}/transcript`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ feedurl: rssUrl, guid, apikey: apiKey }),
+      signal: AbortSignal.timeout(30000)
+    });
+
+    if (!res.ok) {
+      const text = await res.text().catch(() => '');
+      return { error: `HTTP ${res.status}: ${text}` };
+    }
+
+    const data = await res.json();
+    if (data.status === 'ready' && data.url) {
+      const transcriptRes = await fetch(data.url, { signal: AbortSignal.timeout(30000) });
+      if (!transcriptRes.ok) {
+        return { error: `Failed to fetch transcript text: HTTP ${transcriptRes.status}` };
+      }
+      return { transcript: await transcriptRes.text() };
+    }
+
+    if (data.status !== 'processing') {
+      return { error: data.message || `Unexpected status: ${data.status}` };
+    }
+
+    console.error(`      pod2txt: processing (attempt ${attempt}/${maxAttempts})`);
+    if (attempt < maxAttempts) {
+      await new Promise(resolve => setTimeout(resolve, pollInterval));
+    }
   }
 
-  const data = await res.json();
-  const transcript = data?.results?.channels?.[0]?.alternatives?.[0]?.transcript;
-  return transcript ? { transcript } : { error: 'No transcript in Deepgram response' };
+  return { error: 'Timed out waiting for transcript processing' };
 }
 
 // Main podcast fetching function. For each podcast:
-// - YouTube podcasts (url contains youtube.com): resolve channel/playlist →
-//   find latest video → fetch free native captions via fetchYouTubeTranscript
-// - Non-YouTube podcasts (e.g. 小宇宙): fetch RSS audio URL → Deepgram
-async function fetchPodcastContent(podcasts, deepgramKey, state, errors) {
-  const results = [];
+// 1. Fetches RSS to discover recent episodes.
+// 2. Selects unseen episodes inside the lookback window.
+// 3. Requests the first available transcript through pod2txt.
+async function fetchPodcastContent(podcasts, apiKey, state, errors) {
+  if (!apiKey) {
+    errors.push('Podcast: POD2TXT_API_KEY not set');
+    return [];
+  }
+
   const cutoff = new Date(Date.now() - PODCAST_LOOKBACK_HOURS * 60 * 60 * 1000);
+  const allCandidates = [];
 
   for (const podcast of podcasts) {
+    if (!podcast.rssUrl) {
+      errors.push(`Podcast: No rssUrl configured for ${podcast.name}`);
+      continue;
+    }
+
     try {
-      const isYouTube = podcast.url?.includes('youtube.com');
+      console.error(`  Fetching RSS for ${podcast.name}...`);
+      const rssRes = await fetch(podcast.rssUrl, {
+        headers: {
+          'User-Agent': RSS_USER_AGENT,
+          'Accept': 'application/rss+xml, application/xml, text/xml, */*',
+          'Accept-Language': 'en-US,en;q=0.9',
+          'Cache-Control': 'no-cache',
+          'Connection': 'keep-alive'
+        },
+        signal: AbortSignal.timeout(30000)
+      });
 
-      if (isYouTube) {
-        // YouTube path: resolve channel or playlist → YouTube RSS → captions (free)
-        console.error(`  Processing YouTube podcast: ${podcast.name}...`);
+      if (!rssRes.ok) {
+        errors.push(`Podcast: Failed to fetch RSS for ${podcast.name}: HTTP ${rssRes.status}`);
+        continue;
+      }
 
-        let ytRssUrl;
-        const handleMatch = podcast.url.match(/@([^/?\s&]+)/);
-        const playlistMatch = podcast.url.match(/[?&]list=([^&\s]+)/);
-
-        if (handleMatch) {
-          const channelId = await resolveYouTubeChannelId(handleMatch[1]);
-          if (!channelId) {
-            errors.push(`Podcast: Could not resolve YouTube channel for ${podcast.name}`);
-            continue;
-          }
-          ytRssUrl = `https://www.youtube.com/feeds/videos.xml?channel_id=${channelId}`;
-        } else if (playlistMatch) {
-          ytRssUrl = `https://www.youtube.com/feeds/videos.xml?playlist_id=${playlistMatch[1]}`;
-        } else {
-          errors.push(`Podcast: Cannot determine YouTube channel/playlist for ${podcast.name}`);
-          continue;
-        }
-
-        const rssRes = await fetch(ytRssUrl, {
-          headers: { 'User-Agent': RSS_USER_AGENT },
-          signal: AbortSignal.timeout(15000)
-        });
-        if (!rssRes.ok) {
-          errors.push(`Podcast: YouTube RSS fetch failed for ${podcast.name}: HTTP ${rssRes.status}`);
-          continue;
-        }
-
-        const videos = parseYouTubeRss(await rssRes.text());
-        const newVideos = videos
-          .filter(v => !state.seenVideos[v.videoId])
-          .filter(v => !v.publishedAt || new Date(v.publishedAt) >= cutoff)
-          .slice(0, 1);
-
-        for (const video of newVideos) {
-          console.error(`    Fetching captions for "${video.title}"...`);
-          const transcript = await fetchYouTubeTranscript(video.videoId);
-          state.seenVideos[video.videoId] = Date.now();
-
-          if (!transcript) {
-            console.error(`    No captions available — skipping`);
-            errors.push(`Podcast: No captions for "${video.title}" (${podcast.name})`);
-            continue;
-          }
-
-          console.error(`    Got transcript (${transcript.length} chars)`);
-          results.push({
-            source: 'podcast',
-            name: podcast.name,
-            title: video.title,
-            guid: video.videoId,
-            url: `https://www.youtube.com/watch?v=${video.videoId}`,
-            publishedAt: video.publishedAt,
-            transcript
-          });
-        }
-      } else {
-        // Non-YouTube path (e.g. 小宇宙): RSS audio URL → Deepgram transcription
-        if (!podcast.rssUrl) {
-          errors.push(`Podcast: No rssUrl configured for ${podcast.name}`);
-          continue;
-        }
-
-        console.error(`  Fetching RSS for ${podcast.name}...`);
-        const rssRes = await fetch(podcast.rssUrl, {
-          headers: {
-            'User-Agent': RSS_USER_AGENT,
-            'Accept': 'application/rss+xml, application/xml, text/xml, */*',
-            'Accept-Language': 'en-US,en;q=0.9',
-            'Cache-Control': 'no-cache',
-            'Connection': 'keep-alive'
-          },
-          signal: AbortSignal.timeout(30000)
-        });
-
-        if (!rssRes.ok) {
-          errors.push(`Podcast: Failed to fetch RSS for ${podcast.name}: HTTP ${rssRes.status}`);
-          continue;
-        }
-
-        const episodes = parseRssFeed(await rssRes.text());
-        console.error(`  ${podcast.name}: found ${episodes.length} episodes`);
-
-        const candidates = episodes
-          .slice(0, 3)
-          .filter(ep => !state.seenVideos[ep.guid])
-          .filter(ep => !ep.publishedAt || new Date(ep.publishedAt) >= cutoff);
-
-        for (const episode of candidates) {
-          state.seenVideos[episode.guid] = Date.now();
-
-          if (!episode.enclosureUrl) {
-            errors.push(`Podcast: No audio URL in RSS for "${episode.title}" (${podcast.name})`);
-            continue;
-          }
-
-          console.error(`    Transcribing "${episode.title}" via Deepgram...`);
-          const result = await fetchDeepgramTranscript(episode.enclosureUrl, deepgramKey);
-
-          if (result.error) {
-            console.error(`    Deepgram error: ${result.error}`);
-            errors.push(`Podcast: Deepgram error for "${episode.title}": ${result.error}`);
-            continue;
-          }
-
-          console.error(`    Got transcript (${result.transcript.length} chars)`);
-          results.push({
-            source: 'podcast',
-            name: podcast.name,
-            title: episode.title,
-            guid: episode.guid,
-            url: episode.link || podcast.url,
-            publishedAt: episode.publishedAt,
-            transcript: result.transcript
-          });
-          break; // one episode per podcast per run
-        }
+      const episodes = parseRssFeed(await rssRes.text());
+      console.error(`  ${podcast.name}: found ${episodes.length} episodes`);
+      for (const episode of episodes.slice(0, 3)) {
+        if (state.seenVideos[episode.guid]) continue;
+        if (episode.publishedAt && new Date(episode.publishedAt) < cutoff) continue;
+        allCandidates.push({ podcast, ...episode });
       }
     } catch (err) {
       errors.push(`Podcast: Error processing ${podcast.name}: ${err.message}`);
     }
   }
 
-  return results;
+  allCandidates.sort((a, b) => {
+    if (a.publishedAt && b.publishedAt) return new Date(b.publishedAt) - new Date(a.publishedAt);
+    if (a.publishedAt) return -1;
+    if (b.publishedAt) return 1;
+    return 0;
+  });
+
+  for (const selected of allCandidates) {
+    console.error(`    Fetching transcript for "${selected.title}" via pod2txt...`);
+    const result = await fetchPod2txtTranscript(selected.podcast.rssUrl, selected.guid, apiKey);
+
+    if (result.error || !result.transcript?.trim()) {
+      const error = result.error || 'Empty transcript';
+      errors.push(`Podcast: Transcript error for "${selected.title}": ${error}`);
+      continue;
+    }
+
+    state.seenVideos[selected.guid] = Date.now();
+    return [{
+      source: 'podcast',
+      name: selected.podcast.name,
+      title: selected.title,
+      guid: selected.guid,
+      url: selected.link || selected.podcast.url,
+      publishedAt: selected.publishedAt,
+      transcript: result.transcript
+    }];
+  }
+
+  return [];
 }
 
 // -- X/Twitter Fetching (agent-twitter-client, no API key required) ----------
@@ -838,15 +790,12 @@ async function main() {
     password: process.env.TWITTER_PASSWORD,
     email: process.env.TWITTER_EMAIL,
   };
-  const deepgramKey = process.env.DEEPGRAM_API_KEY;
+  const pod2txtKey = process.env.POD2TXT_API_KEY;
 
   if (runTweets && (!twitterCreds.username || !twitterCreds.password || !twitterCreds.email)) {
     console.error('TWITTER_USERNAME, TWITTER_PASSWORD, and TWITTER_EMAIL must all be set');
     process.exit(1);
   }
-  // Podcasts: YouTube channels use free native captions; DEEPGRAM_API_KEY is only
-  // required for non-YouTube sources (e.g. 小宇宙). Missing key skips those podcasts.
-
   const sources = await loadSources();
   const state = await loadState();
   const errors = [];
@@ -872,8 +821,8 @@ async function main() {
 
   // Fetch podcasts
   if (runPodcasts) {
-    console.error('Fetching podcast content...');
-    const podcasts = await fetchPodcastContent(sources.podcasts, deepgramKey, state, errors);
+    console.error('Fetching podcast content (RSS + pod2txt)...');
+    const podcasts = await fetchPodcastContent(sources.podcasts, pod2txtKey, state, errors);
     console.error(`  Found ${podcasts.length} new episodes`);
 
     const podcastFeed = {
