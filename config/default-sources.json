@@ -39,6 +39,31 @@
       "name": "自习室 STUDY ROOM",
       "rssUrl": "https://www.ximalaya.com/album/80074602.xml",
       "url": "https://www.xiaoyuzhoufm.com/podcast/自习室"
+    },
+    {
+      "name": "Dwarkesh Podcast",
+      "rssUrl": "https://apple.dwarkesh-podcast.workers.dev/feed.rss",
+      "url": "https://www.dwarkesh.com/podcast"
+    },
+    {
+      "name": "The Cognitive Revolution",
+      "rssUrl": "https://feeds.megaphone.fm/RINTP3108857801",
+      "url": "https://www.cognitiverevolution.ai/"
+    },
+    {
+      "name": "Practical AI",
+      "rssUrl": "https://feeds.transistor.fm/practical-ai-machine-learning-data-science-llm",
+      "url": "https://changelog.com/practicalai"
+    },
+    {
+      "name": "Gradient Dissent",
+      "rssUrl": "https://feeds.captivate.fm/gradient-dissent/",
+      "url": "https://wandb.ai/fully-connected/gradient-dissent"
+    },
+    {
+      "name": "Eye On A.I.",
+      "rssUrl": "https://rss.libsyn.com/shows/123267/destinations/727317.xml",
+      "url": "https://www.eye-on.ai/podcast"
     }
   ],
   "blogs": [
@@ -87,7 +112,22 @@
     { "name": "Ethan Mollick", "handle": "emollick" },
     { "name": "Simon Willison", "handle": "simonw" },
     { "name": "Yann LeCun", "handle": "ylecun" },
-    { "name": "Greg Brockman", "handle": "gdb" }
+    { "name": "Greg Brockman", "handle": "gdb" },
+    { "name": "Harrison Chase", "handle": "hwchase17" },
+    { "name": "Logan Kilpatrick", "handle": "OfficialLoganK" },
+    { "name": "Jim Fan", "handle": "DrJimFan" },
+    { "name": "Noam Brown", "handle": "polynoamial" },
+    { "name": "François Chollet", "handle": "fchollet" },
+    { "name": "Jeff Dean", "handle": "JeffDean" },
+    { "name": "Demis Hassabis", "handle": "demishassabis" },
+    { "name": "Andrew Ng", "handle": "AndrewYNg" },
+    { "name": "Clément Delangue", "handle": "ClementDelangue" },
+    { "name": "Thomas Wolf", "handle": "Thom_Wolf" },
+    { "name": "Aravind Srinivas", "handle": "AravSrinivas" },
+    { "name": "Hamel Husain", "handle": "HamelHusain" },
+    { "name": "Jason Liu", "handle": "jxnlco" },
+    { "name": "Chip Huyen", "handle": "chipro" },
+    { "name": "Jerry Liu", "handle": "jerryjliu0" }
   ],
   "youtube_channels": [
     { "name": "Andrej Karpathy", "handle": "AndrejKarpathy" },

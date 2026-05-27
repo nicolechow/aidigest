@@ -67,16 +67,23 @@ These are plain English instructions, not code. Changes take effect on the next 
 
 ## Default Sources
 
-### Podcasts (6)
+### Podcasts (13)
 - [Latent Space](https://www.youtube.com/@LatentSpacePod)
 - [Training Data](https://www.youtube.com/playlist?list=PLOhHNjZItNnMm5tdW61JpnyxeYH5NDDx8)
 - [No Priors](https://www.youtube.com/@NoPriorsPodcast)
 - [Unsupervised Learning](https://www.youtube.com/@RedpointAI)
 - [The MAD Podcast with Matt Turck](https://www.youtube.com/@DataDrivenNYC)
 - [AI & I by Every](https://www.youtube.com/playlist?list=PLuMcoKK9mKgHtW_o9h5sGO2vXrffKHwJL)
+- [Lenny's Podcast](https://www.youtube.com/@LennysPodcast)
+- [自习室 STUDY ROOM](https://www.xiaoyuzhoufm.com/podcast/自习室)
+- [Dwarkesh Podcast](https://www.dwarkesh.com/podcast)
+- [The Cognitive Revolution](https://www.cognitiverevolution.ai/)
+- [Practical AI](https://changelog.com/practicalai)
+- [Gradient Dissent](https://wandb.ai/fully-connected/gradient-dissent)
+- [Eye On A.I.](https://www.eye-on.ai/podcast)
 
-### AI Builders on X (25)
-[Andrej Karpathy](https://x.com/karpathy), [Swyx](https://x.com/swyx), [Josh Woodward](https://x.com/joshwoodward), [Kevin Weil](https://x.com/kevinweil), [Peter Yang](https://x.com/petergyang), [Nan Yu](https://x.com/thenanyu), [Madhu Guru](https://x.com/realmadhuguru), [Amanda Askell](https://x.com/AmandaAskell), [Cat Wu](https://x.com/_catwu), [Thariq](https://x.com/trq212), [Google Labs](https://x.com/GoogleLabs), [Amjad Masad](https://x.com/amasad), [Guillermo Rauch](https://x.com/rauchg), [Alex Albert](https://x.com/alexalbert__), [Aaron Levie](https://x.com/levie), [Ryo Lu](https://x.com/ryolu_), [Garry Tan](https://x.com/garrytan), [Matt Turck](https://x.com/mattturck), [Nikunj Kothari](https://x.com/nikunj), [Peter Steinberger](https://x.com/steipete), [Dan Shipper](https://x.com/danshipper), [Aditya Agarwal](https://x.com/adityaag), [Sam Altman](https://x.com/sama), [Claude](https://x.com/claudeai)
+### AI Builders on X (44)
+[Andrej Karpathy](https://x.com/karpathy), [Swyx](https://x.com/swyx), [Josh Woodward](https://x.com/joshwoodward), [Kevin Weil](https://x.com/kevinweil), [Peter Yang](https://x.com/petergyang), [Nan Yu](https://x.com/thenanyu), [Madhu Guru](https://x.com/realmadhuguru), [Amanda Askell](https://x.com/AmandaAskell), [Cat Wu](https://x.com/_catwu), [Thariq](https://x.com/trq212), [Google Labs](https://x.com/GoogleLabs), [Amjad Masad](https://x.com/amasad), [Guillermo Rauch](https://x.com/rauchg), [Alex Albert](https://x.com/alexalbert__), [Aaron Levie](https://x.com/levie), [Ryo Lu](https://x.com/ryolu_), [Garry Tan](https://x.com/garrytan), [Matt Turck](https://x.com/mattturck), [Nikunj Kothari](https://x.com/nikunj), [Peter Steinberger](https://x.com/steipete), [Dan Shipper](https://x.com/danshipper), [Aditya Agarwal](https://x.com/adityaag), [Zara Zhang](https://x.com/zarazhangrui), [Sam Altman](https://x.com/sama), [Claude](https://x.com/claudeai), [Ethan Mollick](https://x.com/emollick), [Simon Willison](https://x.com/simonw), [Yann LeCun](https://x.com/ylecun), [Greg Brockman](https://x.com/gdb), [Harrison Chase](https://x.com/hwchase17), [Logan Kilpatrick](https://x.com/OfficialLoganK), [Jim Fan](https://x.com/DrJimFan), [Noam Brown](https://x.com/polynoamial), [François Chollet](https://x.com/fchollet), [Jeff Dean](https://x.com/JeffDean), [Demis Hassabis](https://x.com/demishassabis), [Andrew Ng](https://x.com/AndrewYNg), [Clément Delangue](https://x.com/ClementDelangue), [Thomas Wolf](https://x.com/Thom_Wolf), [Aravind Srinivas](https://x.com/AravSrinivas), [Hamel Husain](https://x.com/HamelHusain), [Jason Liu](https://x.com/jxnlco), [Chip Huyen](https://x.com/chipro), [Jerry Liu](https://x.com/jerryjliu0)
 
 ### Official Blogs (2)
 - [Anthropic Engineering](https://www.anthropic.com/engineering) — technical deep-dives from the Anthropic team
@@ -128,4 +135,3 @@ See [examples/sample-digest.md](examples/sample-digest.md) for what the output l
 ## License
 
 MIT
-
