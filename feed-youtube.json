@@ -1,11 +1,13 @@
 {
-  "generatedAt": "2026-05-26T10:09:38.963Z",
+  "generatedAt": "2026-05-27T02:04:10.351Z",
   "lookbackHours": 168,
   "youtube": [],
   "stats": {
     "youtubeVideos": 0
   },
   "errors": [
-    "YouTube: No captions for \"How to Give AI Agents Enough Context to Be Useful\" (1egwM88T3C0)"
+    "YouTube: RSS fetch failed for Andrej Karpathy: HTTP 404",
+    "YouTube: RSS fetch failed for Lex Fridman: HTTP 404",
+    "YouTube: RSS fetch failed for Y Combinator: HTTP 404"
   ]
 }

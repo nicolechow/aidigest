@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-26T10:08:55.701Z",
+  "generatedAt": "2026-05-27T02:03:53.241Z",
   "lookbackHours": 24,
   "x": [],
   "stats": {
@@ -7,6 +7,6 @@
     "totalTweets": 0
   },
   "errors": [
-    "X API: User lookup failed: HTTP 402"
+    "X: Login error: {\"errors\":[{\"message\":\"Sorry, that page does not exist\",\"code\":34}]}"
   ]
 }
