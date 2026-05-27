@@ -184,8 +184,8 @@ async function main() {
   const digestText = await getDigestText();
 
   if (!digestText || digestText.trim().length === 0) {
-    console.log(JSON.stringify({ status: 'skipped', reason: 'Empty digest text' }));
-    return;
+    console.log(JSON.stringify({ status: 'error', reason: 'Empty digest text' }));
+    process.exit(1);
   }
 
   try {

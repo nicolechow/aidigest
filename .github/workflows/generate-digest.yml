@@ -24,6 +24,16 @@ jobs:
       - name: Install dependencies
         run: cd scripts && npm ci
 
+      - name: Validate required secrets
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          test -n "$ANTHROPIC_API_KEY" || { echo "ANTHROPIC_API_KEY secret is missing"; exit 1; }
+          test -n "$TELEGRAM_BOT_TOKEN" || { echo "TELEGRAM_BOT_TOKEN secret is missing"; exit 1; }
+          test -n "$TELEGRAM_CHAT_ID" || { echo "TELEGRAM_CHAT_ID secret is missing"; exit 1; }
+
       - name: Set up delivery config
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
@@ -31,9 +41,15 @@ jobs:
         run: |
           mkdir -p ~/.follow-builders
           echo "TELEGRAM_BOT_TOKEN=$TELEGRAM_BOT_TOKEN" > ~/.follow-builders/.env
-          echo '{"language":"en","delivery":{"method":"telegram","chatId":"'"$TELEGRAM_CHAT_ID"'"}}' > ~/.follow-builders/config.json
+          echo '{"language":"bilingual","delivery":{"method":"telegram","chatId":"'"$TELEGRAM_CHAT_ID"'"}}' > ~/.follow-builders/config.json
 
-      - name: Generate and deliver digest
+      - name: Generate digest
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-        run: cd scripts && node generate-digest.js | node deliver.js
+        run: |
+          cd scripts
+          node generate-digest.js > /tmp/ai-digest.txt
+          test -s /tmp/ai-digest.txt || { echo "Generated digest is empty"; exit 1; }
+
+      - name: Deliver digest
+        run: cd scripts && node deliver.js --file /tmp/ai-digest.txt
