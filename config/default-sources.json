@@ -113,21 +113,10 @@
     { "name": "Simon Willison", "handle": "simonw" },
     { "name": "Yann LeCun", "handle": "ylecun" },
     { "name": "Greg Brockman", "handle": "gdb" },
-    { "name": "Harrison Chase", "handle": "hwchase17" },
     { "name": "Logan Kilpatrick", "handle": "OfficialLoganK" },
-    { "name": "Jim Fan", "handle": "DrJimFan" },
-    { "name": "Noam Brown", "handle": "polynoamial" },
-    { "name": "François Chollet", "handle": "fchollet" },
-    { "name": "Jeff Dean", "handle": "JeffDean" },
-    { "name": "Demis Hassabis", "handle": "demishassabis" },
     { "name": "Andrew Ng", "handle": "AndrewYNg" },
-    { "name": "Clément Delangue", "handle": "ClementDelangue" },
-    { "name": "Thomas Wolf", "handle": "Thom_Wolf" },
     { "name": "Aravind Srinivas", "handle": "AravSrinivas" },
-    { "name": "Hamel Husain", "handle": "HamelHusain" },
-    { "name": "Jason Liu", "handle": "jxnlco" },
-    { "name": "Chip Huyen", "handle": "chipro" },
-    { "name": "Jerry Liu", "handle": "jerryjliu0" }
+    { "name": "Chip Huyen", "handle": "chipro" }
   ],
   "youtube_channels": [
     { "name": "Andrej Karpathy", "handle": "AndrejKarpathy" },
