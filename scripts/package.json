@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.39.0",
+    "agent-twitter-client": "^0.0.18",
     "dotenv": "^16.4.0",
     "proper-lockfile": "^4.1.0"
   }

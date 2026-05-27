@@ -10,12 +10,13 @@
 // URLs in state-feed.json so content is never repeated across runs.
 //
 // Usage: node generate-feed.js [--tweets-only | --podcasts-only | --blogs-only]
-// Env vars needed: X_BEARER_TOKEN, DEEPGRAM_API_KEY (for non-YouTube podcasts)
+// Env vars needed: TWITTER_USERNAME, TWITTER_PASSWORD, TWITTER_EMAIL, DEEPGRAM_API_KEY
 // ============================================================================
 
 import { readFile, writeFile } from 'fs/promises';
 import { existsSync } from 'fs';
 import { join } from 'path';
+import { Scraper } from 'agent-twitter-client';
 
 // -- Constants ---------------------------------------------------------------
 
@@ -279,110 +280,69 @@ async function fetchPodcastContent(podcasts, deepgramKey, state, errors) {
   return results;
 }
 
-// -- X/Twitter Fetching (Official API v2) ------------------------------------
+// -- X/Twitter Fetching (agent-twitter-client, no API key required) ----------
 
-async function fetchXContent(xAccounts, bearerToken, state, errors) {
+async function fetchXContent(xAccounts, credentials, state, errors) {
   const results = [];
   const cutoff = new Date(Date.now() - TWEET_LOOKBACK_HOURS * 60 * 60 * 1000);
 
-  // Batch lookup all user IDs (1 API call)
-  const handles = xAccounts.map(a => a.handle);
-  let userMap = {};
-
-  for (let i = 0; i < handles.length; i += 100) {
-    const batch = handles.slice(i, i + 100);
-    try {
-      const res = await fetch(
-        `${X_API_BASE}/users/by?usernames=${batch.join(',')}&user.fields=name,description`,
-        { headers: { 'Authorization': `Bearer ${bearerToken}` } }
-      );
-
-      if (!res.ok) {
-        errors.push(`X API: User lookup failed: HTTP ${res.status}`);
-        continue;
-      }
-
-      const data = await res.json();
-      for (const user of (data.data || [])) {
-        userMap[user.username.toLowerCase()] = {
-          id: user.id,
-          name: user.name,
-          description: user.description || ''
-        };
-      }
-      if (data.errors) {
-        for (const err of data.errors) {
-          errors.push(`X API: User not found: ${err.value || err.detail}`);
-        }
-      }
-    } catch (err) {
-      errors.push(`X API: User lookup error: ${err.message}`);
+  // Login with account credentials
+  const scraper = new Scraper();
+  try {
+    await scraper.login(credentials.username, credentials.password, credentials.email);
+    const loggedIn = await scraper.isLoggedIn();
+    if (!loggedIn) {
+      errors.push('X: Login failed — check TWITTER_USERNAME/PASSWORD/EMAIL secrets');
+      return results;
     }
+    console.error('  X: logged in successfully');
+  } catch (err) {
+    errors.push(`X: Login error: ${err.message}`);
+    return results;
   }
 
-  // Fetch recent tweets per user (max 3, exclude retweets/replies)
   for (const account of xAccounts) {
-    const userData = userMap[account.handle.toLowerCase()];
-    if (!userData) continue;
-
     try {
-      const res = await fetch(
-        `${X_API_BASE}/users/${userData.id}/tweets?` +
-        `max_results=5` +       // fetch 5, then filter to 3 new ones
-        `&tweet.fields=created_at,public_metrics,referenced_tweets,note_tweet` +
-        `&exclude=retweets,replies` +
-        `&start_time=${cutoff.toISOString()}`,
-        { headers: { 'Authorization': `Bearer ${bearerToken}` } }
-      );
+      const tweets = [];
+      // getTweets returns an async generator; collect up to 10 then filter
+      for await (const tweet of scraper.getTweets(account.handle, 10)) {
+        if (!tweet.id) continue;
+        if (tweet.isRetweet || tweet.isReply) continue;
+        if (state.seenTweets[tweet.id]) continue;
 
-      if (!res.ok) {
-        if (res.status === 429) {
-          errors.push(`X API: Rate limited, skipping remaining accounts`);
-          break;
-        }
-        errors.push(`X API: Failed to fetch tweets for @${account.handle}: HTTP ${res.status}`);
-        continue;
-      }
+        const createdAt = tweet.timeParsed?.toISOString() || null;
+        if (createdAt && new Date(createdAt) < cutoff) break; // tweets are newest-first
 
-      const data = await res.json();
-      const allTweets = data.data || [];
-
-      // Filter out already-seen tweets, cap at 3
-      const newTweets = [];
-      for (const t of allTweets) {
-        if (state.seenTweets[t.id]) continue; // dedup
-        if (newTweets.length >= MAX_TWEETS_PER_USER) break;
-
-        newTweets.push({
-          id: t.id,
-          // note_tweet.text has the full untruncated text for long tweets (>280 chars)
-          text: t.note_tweet?.text || t.text,
-          createdAt: t.created_at,
-          url: `https://x.com/${account.handle}/status/${t.id}`,
-          likes: t.public_metrics?.like_count || 0,
-          retweets: t.public_metrics?.retweet_count || 0,
-          replies: t.public_metrics?.reply_count || 0,
-          isQuote: t.referenced_tweets?.some(r => r.type === 'quoted') || false,
-          quotedTweetId: t.referenced_tweets?.find(r => r.type === 'quoted')?.id || null
+        tweets.push({
+          id: tweet.id,
+          text: tweet.fullText || tweet.text || '',
+          createdAt,
+          url: `https://x.com/${account.handle}/status/${tweet.id}`,
+          likes: tweet.likes || 0,
+          retweets: tweet.retweets || 0,
+          replies: tweet.replies || 0,
+          isQuote: tweet.isQuoted || false,
         });
 
-        // Mark as seen
-        state.seenTweets[t.id] = Date.now();
+        state.seenTweets[tweet.id] = Date.now();
+        if (tweets.length >= MAX_TWEETS_PER_USER) break;
       }
 
-      if (newTweets.length === 0) continue;
+      if (tweets.length === 0) continue;
 
+      const profile = await scraper.getProfile(account.handle).catch(() => ({}));
       results.push({
         source: 'x',
         name: account.name,
         handle: account.handle,
-        bio: userData.description,
-        tweets: newTweets
+        bio: profile.biography || '',
+        tweets
       });
 
-      await new Promise(r => setTimeout(r, 200));
+      // Small delay between accounts to avoid rate limits
+      await new Promise(r => setTimeout(r, 500));
     } catch (err) {
-      errors.push(`X API: Error fetching @${account.handle}: ${err.message}`);
+      errors.push(`X: Error fetching @${account.handle}: ${err.message}`);
     }
   }
 
@@ -873,11 +833,15 @@ async function main() {
   const runBlogs = blogsOnly || !anyOnly;
   const runYouTube = youtubeOnly || !anyOnly;
 
-  const xBearerToken = process.env.X_BEARER_TOKEN;
+  const twitterCreds = {
+    username: process.env.TWITTER_USERNAME,
+    password: process.env.TWITTER_PASSWORD,
+    email: process.env.TWITTER_EMAIL,
+  };
   const deepgramKey = process.env.DEEPGRAM_API_KEY;
 
-  if (runTweets && !xBearerToken) {
-    console.error('X_BEARER_TOKEN not set');
+  if (runTweets && (!twitterCreds.username || !twitterCreds.password || !twitterCreds.email)) {
+    console.error('TWITTER_USERNAME, TWITTER_PASSWORD, and TWITTER_EMAIL must all be set');
     process.exit(1);
   }
   // Podcasts: YouTube channels use free native captions; DEEPGRAM_API_KEY is only
@@ -890,7 +854,7 @@ async function main() {
   // Fetch tweets
   if (runTweets) {
     console.error('Fetching X/Twitter content...');
-    const xContent = await fetchXContent(sources.x_accounts, xBearerToken, state, errors);
+    const xContent = await fetchXContent(sources.x_accounts, twitterCreds, state, errors);
     console.error(`  Found ${xContent.length} builders with new tweets`);
 
     const totalTweets = xContent.reduce((sum, a) => sum + a.tweets.length, 0);
@@ -899,8 +863,8 @@ async function main() {
       lookbackHours: TWEET_LOOKBACK_HOURS,
       x: xContent,
       stats: { xBuilders: xContent.length, totalTweets },
-      errors: errors.filter(e => e.startsWith('X API')).length > 0
-        ? errors.filter(e => e.startsWith('X API')) : undefined
+      errors: errors.filter(e => e.startsWith('X')).length > 0
+        ? errors.filter(e => e.startsWith('X')) : undefined
     };
     await writeFile(join(SCRIPT_DIR, '..', 'feed-x.json'), JSON.stringify(xFeed, null, 2));
     console.error(`  feed-x.json: ${xContent.length} builders, ${totalTweets} tweets`);
