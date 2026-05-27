@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-27T23:21:58.849Z",
+  "generatedAt": "2026-05-27T23:42:09.124Z",
   "lookbackHours": 24,
   "x": [],
   "stats": {
@@ -7,6 +7,38 @@
     "totalTweets": 0
   },
   "errors": [
-    "X: Login error: {\"errors\":[{\"message\":\"Sorry, that page does not exist\",\"code\":34}]}"
+    "X: Error fetching @karpathy: Your enrolled account [2058392111725105152] does not have any credits to fulfill this request.",
+    "X: Error fetching @swyx: Your enrolled account [2058392111725105152] does not have any credits to fulfill this request.",
+    "X: Error fetching @joshwoodward: Your enrolled account [2058392111725105152] does not have any credits to fulfill this request.",
+    "X: Error fetching @kevinweil: Your enrolled account [2058392111725105152] does not have any credits to fulfill this request.",
+    "X: Error fetching @petergyang: Your enrolled account [2058392111725105152] does not have any credits to fulfill this request.",
+    "X: Error fetching @thenanyu: Your enrolled account [2058392111725105152] does not have any credits to fulfill this request.",
+    "X: Error fetching @realmadhuguru: Your enrolled account [2058392111725105152] does not have any credits to fulfill this request.",
+    "X: Error fetching @AmandaAskell: Your enrolled account [2058392111725105152] does not have any credits to fulfill this request.",
+    "X: Error fetching @_catwu: Your enrolled account [2058392111725105152] does not have any credits to fulfill this request.",
+    "X: Error fetching @trq212: Your enrolled account [2058392111725105152] does not have any credits to fulfill this request.",
+    "X: Error fetching @GoogleLabs: Your enrolled account [2058392111725105152] does not have any credits to fulfill this request.",
+    "X: Error fetching @amasad: Your enrolled account [2058392111725105152] does not have any credits to fulfill this request.",
+    "X: Error fetching @rauchg: Your enrolled account [2058392111725105152] does not have any credits to fulfill this request.",
+    "X: Error fetching @alexalbert__: Your enrolled account [2058392111725105152] does not have any credits to fulfill this request.",
+    "X: Error fetching @levie: Your enrolled account [2058392111725105152] does not have any credits to fulfill this request.",
+    "X: Error fetching @ryolu_: Your enrolled account [2058392111725105152] does not have any credits to fulfill this request.",
+    "X: Error fetching @garrytan: Your enrolled account [2058392111725105152] does not have any credits to fulfill this request.",
+    "X: Error fetching @mattturck: Your enrolled account [2058392111725105152] does not have any credits to fulfill this request.",
+    "X: Error fetching @nikunj: Your enrolled account [2058392111725105152] does not have any credits to fulfill this request.",
+    "X: Error fetching @steipete: Your enrolled account [2058392111725105152] does not have any credits to fulfill this request.",
+    "X: Error fetching @danshipper: Your enrolled account [2058392111725105152] does not have any credits to fulfill this request.",
+    "X: Error fetching @adityaag: Your enrolled account [2058392111725105152] does not have any credits to fulfill this request.",
+    "X: Error fetching @zarazhangrui: Your enrolled account [2058392111725105152] does not have any credits to fulfill this request.",
+    "X: Error fetching @sama: Your enrolled account [2058392111725105152] does not have any credits to fulfill this request.",
+    "X: Error fetching @claudeai: Your enrolled account [2058392111725105152] does not have any credits to fulfill this request.",
+    "X: Error fetching @emollick: Your enrolled account [2058392111725105152] does not have any credits to fulfill this request.",
+    "X: Error fetching @simonw: Your enrolled account [2058392111725105152] does not have any credits to fulfill this request.",
+    "X: Error fetching @ylecun: Your enrolled account [2058392111725105152] does not have any credits to fulfill this request.",
+    "X: Error fetching @gdb: Your enrolled account [2058392111725105152] does not have any credits to fulfill this request.",
+    "X: Error fetching @OfficialLoganK: Your enrolled account [2058392111725105152] does not have any credits to fulfill this request.",
+    "X: Error fetching @AndrewYNg: Your enrolled account [2058392111725105152] does not have any credits to fulfill this request.",
+    "X: Error fetching @AravSrinivas: Your enrolled account [2058392111725105152] does not have any credits to fulfill this request.",
+    "X: Error fetching @chipro: Your enrolled account [2058392111725105152] does not have any credits to fulfill this request."
   ]
 }
