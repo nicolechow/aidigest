@@ -1,8 +1,11 @@
 {
-  "generatedAt": "2026-05-29T13:55:10.636Z",
+  "generatedAt": "2026-05-30T12:02:40.299Z",
   "lookbackHours": 168,
   "youtube": [],
   "stats": {
     "youtubeVideos": 0
-  }
+  },
+  "errors": [
+    "YouTube: No captions for \"Is dark matter real? - Why can't we find it? - physicist explains | Don Lincoln and Lex Fridman\" (OE0ZvZYipwI)"
+  ]
 }
