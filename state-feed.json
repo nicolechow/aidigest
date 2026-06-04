@@ -29,13 +29,15 @@
     "E0JB-DirSFs": 1780229247631,
     "5hjBpKknTJo": 1780331645805,
     "Oq71T2CDHiI": 1780411678931,
-    "MNXUccJW0mA": 1780500357815
+    "MNXUccJW0mA": 1780500357815,
+    "EyjMQUXra74": 1780581346576
   },
   "seenArticles": {
     "https://www.anthropic.com/engineering/april-23-postmortem": 1780331637649,
     "https://www.anthropic.com/engineering/managed-agents": 1780331641556,
     "https://claude.com/blog/claude-managed-agents-updates": 1780331642289,
     "https://claude.com/blog/new-in-claude-managed-agents": 1780331642881,
-    "https://claude.com/blog/connectors-for-everyday-life": 1780331643454
+    "https://claude.com/blog/connectors-for-everyday-life": 1780331643454,
+    "https://www.anthropic.com/engineering/how-we-contain-claude": 1780581344560
   }
 }
