@@ -1,11 +1,8 @@
 {
-  "generatedAt": "2026-06-10T14:20:27.864Z",
+  "generatedAt": "2026-06-11T14:33:22.079Z",
   "lookbackHours": 168,
   "youtube": [],
   "stats": {
     "youtubeVideos": 0
-  },
-  "errors": [
-    "YouTube: No captions for \"What's the perfect encoding? How do you know?\" (7L_eTem1SQ4)"
-  ]
+  }
 }
