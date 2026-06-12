@@ -1,8 +1,11 @@
 {
-  "generatedAt": "2026-06-11T14:33:22.079Z",
+  "generatedAt": "2026-06-12T14:00:35.093Z",
   "lookbackHours": 168,
   "youtube": [],
   "stats": {
     "youtubeVideos": 0
-  }
+  },
+  "errors": [
+    "YouTube: No captions for \"Measuring the entropy of English\" (-7etvZSBxlk)"
+  ]
 }
