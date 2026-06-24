@@ -1,8 +1,11 @@
 {
-  "generatedAt": "2026-06-23T13:40:03.312Z",
+  "generatedAt": "2026-06-24T13:14:31.259Z",
   "lookbackHours": 168,
   "youtube": [],
   "stats": {
     "youtubeVideos": 0
-  }
+  },
+  "errors": [
+    "YouTube: No captions for \"AI Agents Are Killing the Engineering Pyramid — Here's What Replaces It\" (m00FTHk7570)"
+  ]
 }
