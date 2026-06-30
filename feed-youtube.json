@@ -1,8 +1,11 @@
 {
-  "generatedAt": "2026-06-29T14:44:13.788Z",
+  "generatedAt": "2026-06-30T13:07:07.028Z",
   "lookbackHours": 168,
   "youtube": [],
   "stats": {
     "youtubeVideos": 0
-  }
+  },
+  "errors": [
+    "YouTube: No captions for \"The AI Agents Helping Home Services Book More Jobs\" (EHp1HgwCo9I)"
+  ]
 }
