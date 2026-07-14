@@ -1,11 +1,8 @@
 {
-  "generatedAt": "2026-07-13T13:14:47.707Z",
+  "generatedAt": "2026-07-14T12:06:22.819Z",
   "lookbackHours": 168,
   "youtube": [],
   "stats": {
     "youtubeVideos": 0
-  },
-  "errors": [
-    "YouTube: No captions for \"Why the Roman Empire collapsed in the East | Anthony Kaldellis and Lex Fridman\" (GgA6_c87BYg)"
-  ]
+  }
 }
