@@ -1,8 +1,11 @@
 {
-  "generatedAt": "2026-07-15T12:10:54.602Z",
+  "generatedAt": "2026-07-16T12:16:11.282Z",
   "lookbackHours": 168,
   "youtube": [],
   "stats": {
     "youtubeVideos": 0
-  }
+  },
+  "errors": [
+    "YouTube: No captions for \"But what is cross-entropy? | Compression is Intelligence Part 2\" (GlYgs6v2YfU)"
+  ]
 }
