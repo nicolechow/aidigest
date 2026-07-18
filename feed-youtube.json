@@ -1,11 +1,8 @@
 {
-  "generatedAt": "2026-07-17T12:03:35.129Z",
+  "generatedAt": "2026-07-18T11:48:57.030Z",
   "lookbackHours": 168,
   "youtube": [],
   "stats": {
     "youtubeVideos": 0
-  },
-  "errors": [
-    "YouTube: No captions for \"Building the Agentic AI Platform for Hospitals\" (3lQQadC6vKg)"
-  ]
+  }
 }
