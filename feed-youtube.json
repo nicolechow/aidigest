@@ -1,8 +1,11 @@
 {
-  "generatedAt": "2026-07-20T13:01:27.510Z",
+  "generatedAt": "2026-07-21T12:20:35.215Z",
   "lookbackHours": 168,
   "youtube": [],
   "stats": {
     "youtubeVideos": 0
-  }
+  },
+  "errors": [
+    "YouTube: No captions for \"The First Dedicated YC GPU Cluster - With Together AI\" (tOhkv307Pm0)"
+  ]
 }
