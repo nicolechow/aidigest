@@ -1,11 +1,8 @@
 {
-  "generatedAt": "2026-07-25T11:59:11.077Z",
+  "generatedAt": "2026-07-26T11:57:22.188Z",
   "lookbackHours": 168,
   "youtube": [],
   "stats": {
     "youtubeVideos": 0
-  },
-  "errors": [
-    "YouTube: No captions for \"The 64 sugar cubes puzzle\" (6XPlmCDNLNc)"
-  ]
+  }
 }
