@@ -1,11 +1,12 @@
 {
-  "generatedAt": "2026-08-12T11:41:06.475Z",
+  "generatedAt": "2026-08-13T11:41:24.457Z",
   "lookbackHours": 168,
   "youtube": [],
   "stats": {
     "youtubeVideos": 0
   },
   "errors": [
-    "YouTube: No captions for \"Interpretability and Safety for Robot Foundation Models\" (3WAHidozI9M)"
+    "YouTube: No captions for \"Lex Fridman on interviewing Fedor Emelianenko\" (J8BuJb0C7Qw)",
+    "YouTube: No captions for \"Improving Small Language Model Reasoning With A* Search\" (pcxB_CjPIp8)"
   ]
 }
