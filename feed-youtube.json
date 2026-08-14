@@ -1,12 +1,11 @@
 {
-  "generatedAt": "2026-08-13T11:41:24.457Z",
+  "generatedAt": "2026-08-14T11:39:01.830Z",
   "lookbackHours": 168,
   "youtube": [],
   "stats": {
     "youtubeVideos": 0
   },
   "errors": [
-    "YouTube: No captions for \"Lex Fridman on interviewing Fedor Emelianenko\" (J8BuJb0C7Qw)",
-    "YouTube: No captions for \"Improving Small Language Model Reasoning With A* Search\" (pcxB_CjPIp8)"
+    "YouTube: No captions for \"Why Khabib beat up Lex in training\" (8zdtEaFLcSk)"
   ]
 }
