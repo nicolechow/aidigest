@@ -1,11 +1,12 @@
 {
-  "generatedAt": "2026-08-14T11:39:01.830Z",
+  "generatedAt": "2026-08-15T11:13:22.026Z",
   "lookbackHours": 168,
   "youtube": [],
   "stats": {
     "youtubeVideos": 0
   },
   "errors": [
-    "YouTube: No captions for \"Why Khabib beat up Lex in training\" (8zdtEaFLcSk)"
+    "YouTube: No captions for \"Khabib on meeting Fedor Emelianenko | Khabib Nurmagomedov and Lex Fridman\" (_E-Nuw-KHEc)",
+    "YouTube: No captions for \"Building And Structuring An AI Native Company\" (Z3JyAqh4ixg)"
   ]
 }
