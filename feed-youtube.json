@@ -1,11 +1,12 @@
 {
-  "generatedAt": "2026-08-26T11:22:32.708Z",
+  "generatedAt": "2026-08-27T20:52:32.655Z",
   "lookbackHours": 168,
   "youtube": [],
   "stats": {
     "youtubeVideos": 0
   },
   "errors": [
-    "YouTube: No captions for \"Khabib on Ali Abdelaziz | Khabib Nurmagomedov and Lex Fridman\" (AIyC4UPgmyg)"
+    "YouTube: No captions for \"Social media is breaking your brain | DHH and Lex Fridman\" (e_KgPTnuxhM)",
+    "YouTube: No captions for \"How Outset Turned AI Interviews Into a New Category\" (x3XOeDckUX0)"
   ]
 }
