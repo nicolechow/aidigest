@@ -1,12 +1,11 @@
 {
-  "generatedAt": "2026-09-02T14:52:25.870Z",
+  "generatedAt": "2026-09-03T14:50:05.298Z",
   "lookbackHours": 168,
   "youtube": [],
   "stats": {
     "youtubeVideos": 0
   },
   "errors": [
-    "YouTube: No captions for \"Why Linux will win over MacOS/Windows: Linux is best for AI agents | DHH and Lex Fridman\" (dja1V5Y9igI)",
-    "YouTube: No captions for \"Building AI That Optimizes AI\" (7JoqmM5EPXo)"
+    "YouTube: No captions for \"Is AI killing GitHub? | DHH and Lex Fridman\" (x7CqhRVBuLM)"
   ]
 }
