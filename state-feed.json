@@ -1,7 +1,6 @@
 {
   "seenTweets": {},
   "seenVideos": {
-    "AIyC4UPgmyg": 1787743352082,
     "e_KgPTnuxhM": 1787863950947,
     "x3XOeDckUX0": 1787863952655,
     "66XR8e7pC9Y": 1787951909327,
@@ -32,6 +31,7 @@
     "https://claude.com/blog/claude-in-chrome-generally-available": 1789310722033,
     "https://claude.com/blog/cowork-built-in-browser": 1789310722571,
     "https://claude.com/blog/artifacts-in-claude-code": 1789310723104,
-    "https://www.anthropic.com/engineering/how-we-contain-claude": 1789485770132
+    "https://www.anthropic.com/engineering/how-we-contain-claude": 1789485770132,
+    "https://claude.com/blog/claude-for-small-business-launches-new-workflows-integrations-and-training-programs": 1789571747668
   }
 }
