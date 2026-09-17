@@ -1,8 +1,11 @@
 {
-  "generatedAt": "2026-09-16T15:15:49.479Z",
+  "generatedAt": "2026-09-17T15:23:55.202Z",
   "lookbackHours": 168,
   "youtube": [],
   "stats": {
     "youtubeVideos": 0
-  }
+  },
+  "errors": [
+    "YouTube: No captions for \"The ice pick lobotomy: The most horrifying experiment in psychiatry | Andrew Scull and Lex Fridman\" (nsyKbnxwI6k)"
+  ]
 }
