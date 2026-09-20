@@ -1,7 +1,6 @@
 {
   "seenTweets": {},
   "seenVideos": {
-    "uUWTeEvqiQI": 1788017027405,
     "JUBfT_ASYyg": 1788102484975,
     "GQjVGFYei9M": 1788198425209,
     "eRLjukcuxzo": 1788276066209,
@@ -26,7 +25,9 @@
     "UKwpr_Trvns": 1789742660805,
     "bRQEWPA832A": 1789826747559,
     "tcihaHG5TSM": 1789826748687,
-    "5XO7ZEOGpJc": 1789826749976
+    "5XO7ZEOGpJc": 1789826749976,
+    "Nbwv5wHQoj0": 1789914276089,
+    "wRhe3MGnMKc": 1789914277124
   },
   "seenArticles": {
     "https://claude.com/blog/claude-in-chrome-generally-available": 1789310722033,
@@ -34,6 +35,8 @@
     "https://claude.com/blog/artifacts-in-claude-code": 1789310723104,
     "https://www.anthropic.com/engineering/how-we-contain-claude": 1789485770132,
     "https://claude.com/blog/claude-for-small-business-launches-new-workflows-integrations-and-training-programs": 1789571747668,
-    "https://claude.com/blog/cowork-is-now-claude": 1789658632483
+    "https://claude.com/blog/cowork-is-now-claude": 1789658632483,
+    "https://www.anthropic.com/engineering/april-23-postmortem": 1789914273752,
+    "https://www.anthropic.com/engineering/managed-agents": 1789914274348
   }
 }
