@@ -1,11 +1,13 @@
 {
-  "generatedAt": "2026-09-24T15:39:45.324Z",
+  "generatedAt": "2026-09-25T15:42:00.369Z",
   "lookbackHours": 168,
   "youtube": [],
   "stats": {
     "youtubeVideos": 0
   },
   "errors": [
-    "YouTube: No captions for \"Do antipsychotic drugs work? | Andrew Scull and Lex Fridman\" (Vvjeay358RI)"
+    "YouTube: No captions for \"The Phone Number puzzle\" (ausLKMojXaY)",
+    "YouTube: No captions for \"Can we cure mental illness? - The future of psychiatry | Andrew Scull and Lex Fridman\" (1Js_al_Q8Y4)",
+    "YouTube: No captions for \"The Voice AI Platform Powering a Billion Calls a Year\" (2otGNwNOEUM)"
   ]
 }
