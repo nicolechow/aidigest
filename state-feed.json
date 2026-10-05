@@ -1,7 +1,6 @@
 {
   "seenTweets": {},
   "seenVideos": {
-    "BC8e88qzhQU": 1789404214914,
     "ldlvZeFqnVI": 1789485772221,
     "nsyKbnxwI6k": 1789658634506,
     "vXcK9QPpWME": 1789742658981,
@@ -26,8 +25,6 @@
     "kDLji2s7LV4": 1790958413924
   },
   "seenArticles": {
-    "https://www.anthropic.com/engineering/april-23-postmortem": 1790619607471,
-    "https://www.anthropic.com/engineering/managed-agents": 1790619608090,
     "https://claude.com/blog/claude-in-chrome-generally-available": 1790786174005,
     "https://www.anthropic.com/engineering/how-we-contain-claude": 1790958410440,
     "https://claude.com/blog/cowork-is-now-claude": 1791039667067,
