@@ -1,8 +1,11 @@
 {
-  "generatedAt": "2026-10-13T17:52:59.197Z",
+  "generatedAt": "2026-10-14T15:39:49.866Z",
   "lookbackHours": 168,
   "youtube": [],
   "stats": {
     "youtubeVideos": 0
-  }
+  },
+  "errors": [
+    "YouTube: No captions for \"Jensen Huang shows Lex Fridman around Taiwan (Highlight)\" (oCLp6J9pz3E)"
+  ]
 }
