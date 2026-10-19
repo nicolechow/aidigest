@@ -1,7 +1,6 @@
 {
   "seenTweets": {},
   "seenVideos": {
-    "GvQb2jgjerw": 1790522925929,
     "T6hVGJ4gepk": 1790786177076,
     "0-g2-PRrOdw": 1790874790230,
     "kDLji2s7LV4": 1790958413924,
@@ -10,10 +9,12 @@
     "LY32E543H2M": 1792163157693,
     "LKrwhjOI8Nc": 1792245614993,
     "Qmafkf_08uQ": 1792245616123,
-    "E5ujpnDuLeM": 1792332795342
+    "E5ujpnDuLeM": 1792332795342,
+    "9rH1ChuVAe0": 1792430243975
   },
   "seenArticles": {
     "https://www.anthropic.com/engineering/redesigning-source-control": 1791913976762,
-    "https://www.anthropic.com/engineering/april-23-postmortem": 1791992386149
+    "https://www.anthropic.com/engineering/april-23-postmortem": 1791992386149,
+    "https://www.anthropic.com/engineering/how-we-contain-claude": 1792430240960
   }
 }
