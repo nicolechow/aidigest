@@ -1,11 +1,12 @@
 {
-  "generatedAt": "2026-10-21T15:47:02.508Z",
+  "generatedAt": "2026-10-22T15:45:26.576Z",
   "lookbackHours": 168,
   "youtube": [],
   "stats": {
     "youtubeVideos": 0
   },
   "errors": [
-    "YouTube: No captions for \"The best street food in Taiwan with Jensen Huang | Lex Fridman\" (LpH9BnXDEf0)"
+    "YouTube: No captions for \"Jensen Huang on China, GPUs, and export controls | Lex Fridman in Taiwan\" (NG6dKcAJCw0)",
+    "YouTube: No captions for \"AI Trade School for Healthcare\" (fioqpxkOV1A)"
   ]
 }
