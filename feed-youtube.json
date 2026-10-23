@@ -1,12 +1,11 @@
 {
-  "generatedAt": "2026-10-22T15:45:26.576Z",
+  "generatedAt": "2026-10-23T15:35:29.637Z",
   "lookbackHours": 168,
   "youtube": [],
   "stats": {
     "youtubeVideos": 0
   },
   "errors": [
-    "YouTube: No captions for \"Jensen Huang on China, GPUs, and export controls | Lex Fridman in Taiwan\" (NG6dKcAJCw0)",
-    "YouTube: No captions for \"AI Trade School for Healthcare\" (fioqpxkOV1A)"
+    "YouTube: No captions for \"China's approach to AI and robotics | Lex Fridman and Jensen Huang in Taiwan\" (pSopii-RTJg)"
   ]
 }
