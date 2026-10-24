@@ -1,11 +1,8 @@
 {
-  "generatedAt": "2026-10-23T15:35:29.637Z",
+  "generatedAt": "2026-10-24T14:11:09.950Z",
   "lookbackHours": 168,
   "youtube": [],
   "stats": {
     "youtubeVideos": 0
-  },
-  "errors": [
-    "YouTube: No captions for \"China's approach to AI and robotics | Lex Fridman and Jensen Huang in Taiwan\" (pSopii-RTJg)"
-  ]
+  }
 }
