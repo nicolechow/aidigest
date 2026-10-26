@@ -1,8 +1,11 @@
 {
-  "generatedAt": "2026-10-25T14:42:41.552Z",
+  "generatedAt": "2026-10-26T17:04:44.883Z",
   "lookbackHours": 168,
   "youtube": [],
   "stats": {
     "youtubeVideos": 0
-  }
+  },
+  "errors": [
+    "YouTube: No captions for \"Sphere Intersection Puzzle Corrected\" (V_uq3v6xK-4)"
+  ]
 }
