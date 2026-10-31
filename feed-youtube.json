@@ -1,12 +1,11 @@
 {
-  "generatedAt": "2026-10-30T16:55:04.136Z",
+  "generatedAt": "2026-10-31T15:55:30.675Z",
   "lookbackHours": 168,
   "youtube": [],
   "stats": {
     "youtubeVideos": 0
   },
   "errors": [
-    "YouTube: No captions for \"The hardest physics problem in fluid dynamics: Turbulence explained | Lex Fridman\" (o_8nkOrYPk0)",
-    "YouTube: No captions for \"Building AI for the $650B Home Services Market\" (5NRNqjlmnKQ)"
+    "YouTube: No captions for \"AI Crisis in Math: Navier-Stokes, Riemann Hypothesis & Complexity Theory | Lex Fridman Podcast #503\" (ZAzWPE9CItg)"
   ]
 }
