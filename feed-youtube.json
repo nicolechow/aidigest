@@ -1,11 +1,12 @@
 {
-  "generatedAt": "2026-11-03T18:10:58.623Z",
+  "generatedAt": "2026-11-04T18:21:47.192Z",
   "lookbackHours": 168,
   "youtube": [],
   "stats": {
     "youtubeVideos": 0
   },
   "errors": [
-    "YouTube: No captions for \"Why AI works so well? - The unreasonable effectiveness of LLMs | Lex Fridman\" (JLSY2_7LaM8)"
+    "YouTube: No captions for \"Navier-Stokes explained by Mathematician | Lex Fridman\" (2O6wJnCGNdI)",
+    "YouTube: No captions for \"The Right Model for Each Coding Task\" (eN92Oatzzks)"
   ]
 }
