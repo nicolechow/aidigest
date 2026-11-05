@@ -1,12 +1,12 @@
 {
-  "generatedAt": "2026-11-04T18:21:47.192Z",
+  "generatedAt": "2026-11-05T18:26:17.900Z",
   "lookbackHours": 168,
   "youtube": [],
   "stats": {
     "youtubeVideos": 0
   },
   "errors": [
-    "YouTube: No captions for \"Navier-Stokes explained by Mathematician | Lex Fridman\" (2O6wJnCGNdI)",
-    "YouTube: No captions for \"The Right Model for Each Coding Task\" (eN92Oatzzks)"
+    "YouTube: No captions for \"How AI changes education: Should kids still do homework? | Lex Fridman\" (QsUeQ7DRS1M)",
+    "YouTube: No captions for \"The Observability Layer for the Physical World\" (jzAzzJMVIpU)"
   ]
 }
