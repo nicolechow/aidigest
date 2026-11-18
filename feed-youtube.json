@@ -1,13 +1,12 @@
 {
-  "generatedAt": "2026-11-17T19:30:13.745Z",
+  "generatedAt": "2026-11-18T19:12:49.939Z",
   "lookbackHours": 168,
   "youtube": [],
   "stats": {
     "youtubeVideos": 0
   },
   "errors": [
-    "YouTube: No captions for \"How to compress text to 1 bit per character | Compression is Intelligence Part 3\" (qbsb9DpdZ6s)",
-    "YouTube: No captions for \"US war against China or Russia: Why military experts are wrong | Lex Fridman Podcast\" (uixy3VTzYok)",
-    "YouTube: No captions for \"Building the AI Platform for Enterprise Software Implementations\" (FmvRhxq2oHE)"
+    "YouTube: No captions for \"Encoding the encyclopedia on a rod\" (0IZcjWtWmDA)",
+    "YouTube: No captions for \"North Korea's role in Ukraine war | Military Analysis - Lex Fridman Podcast\" (HiFbEMEkI0s)"
   ]
 }
